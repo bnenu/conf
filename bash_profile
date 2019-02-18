@@ -16,6 +16,7 @@ source '/Users/BN/Downloads/google-cloud-sdk/completion.bash.inc'
 
 # Default Vim 
 export EDITOR=/usr/local/bin/vim
+alias v='vim'
 
 # Add node modules installed globally to the path
 export PATH=/usr/local/Cellar/node/10.11.0/bin:$PATH
