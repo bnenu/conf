@@ -10,8 +10,16 @@ syntax enable
 set mouse=a
 set encoding=utf-8
 set fileencoding=utf-8
-"using the system clipboard
-set clipboard=unnamedplus
+
+" yank to clipboard
+if has("clipboard")
+  set clipboard=unnamed " copy to the system clipboard
+
+  if has("unnamedplus") " X11 support
+    set clipboard+=unnamedplus
+  endif
+endif
+"""""""
 
 set expandtab
 set shiftwidth=2
@@ -20,7 +28,14 @@ set tabstop=2
 set noshiftround
 set smarttab
 set backspace=indent,eol,start
-":setlocal foldmethod=syntax
+
+" folding
+set foldmethod=syntax
+set foldnestmax=10
+set nofoldenable
+set foldlevel=2
+"""""""
+
 set autoindent
 set nosmartindent
 set nocindent
@@ -47,7 +62,7 @@ set noshowmode
 let g:netrw_liststyle = 3
 let g:netrw_banner = 0
 
-let mapleader=';'
+let mapleader='\'
 
 cnoremap %% <C-R>=fnameescape(expand('%:h')).'/'<cr>
 map <leader>ew :e %%
@@ -103,6 +118,8 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'tpope/vim-fugitive'
 " Tmux suppport in vim
 Plug 'tpope/vim-tbone'
+" Change surroundings
+Plug 'tpope/surround'
 " Js syntax support
 Plug 'pangloss/vim-javascript'
 Plug 'leshill/vim-json'
@@ -113,8 +130,6 @@ Plug 'cocopon/iceberg.vim'
 Plug 'edkolev/tmuxline.vim'
 " indent lines
 Plug 'nathanaelkane/vim-indent-guides'
-" fuzzy finder global
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " elm support
 Plug 'elmcast/elm-vim'
 " elixir support
