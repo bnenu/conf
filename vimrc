@@ -10,7 +10,18 @@ syntax enable
 set mouse=a
 set encoding=utf-8
 set fileencoding=utf-8
-
+" purity
+noremap <UP>    <Nop>
+noremap <Down>  <Nop>
+noremap <Left>  <Nop>
+noremap <Right> <Nop>
+"""""""
+" code withds
+set textwidth=80
+" set colorcolumn=+1
+" and/or alternate with
+au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
+"""""""
 " yank to clipboard
 if has("clipboard")
   set clipboard=unnamed " copy to the system clipboard
@@ -20,7 +31,6 @@ if has("clipboard")
   endif
 endif
 """""""
-
 set expandtab
 set shiftwidth=2
 set softtabstop=-2
@@ -30,20 +40,17 @@ set smarttab
 set backspace=indent,eol,start
 
 " folding
+":setlocal foldmethod=syntax
 set foldmethod=syntax
 set foldnestmax=10
 set nofoldenable
 set foldlevel=2
 """""""
-
 set autoindent
 set nosmartindent
 set nocindent
 
-set ignorecase
-set smartcase
-set incsearch
-set hlsearch
+
 set wrapscan
 set number
 
@@ -56,11 +63,72 @@ set wildmode=list:longest,full
 set t_Co=256
 set background=dark
 colorscheme slate
-
+" search
+set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+hi Search cterm=NONE ctermfg=black ctermbg=yellow
+"""""""
+" Do not show mode on last line
 set noshowmode
+" status line
+let g:currentmode={
+    \ 'n'      : 'N ',
+    \ 'no'     : 'N·Operator Pending ',
+    \ 'v'      : 'V ',
+    \ 'V'      : 'V·Line ',
+    \ '\<C-V>' : 'V·Block ',
+    \ 's'      : 'Select ',
+    \ 'S'      : 'S·Line ',
+    \ '\<C-S>' : 'S·Block ',
+    \ 'i'      : 'I ',
+    \ 'R'      : 'R ',
+    \ 'Rv'     : 'V·Replace ',
+    \ 'c'      : 'Command ',
+    \ 'cv'     : 'Vim Ex ',
+    \ 'ce'     : 'Ex ',
+    \ 'r'      : 'Prompt ',
+    \ 'rm'     : 'More ',
+    \ 'r?'     : 'Confirm ',
+    \ '!'      : 'Shell ',
+    \ 't'      : 'Terminal '
+    \}
 
+" Function: display errors from Ale in statusline
+function! LinterStatus() abort
+   let l:counts = ale#statusline#Count(bufnr(''))
+   let l:all_errors = l:counts.error + l:counts.style_error
+   let l:all_non_errors = l:counts.total - l:all_errors
+   return l:counts.total == 0 ? '' : printf(
+   \ 'W:%d E:%d',
+   \ l:all_non_errors,
+   \ l:all_errors
+   \)
+endfunction
+
+set laststatus=2
+set statusline=
+set statusline+=\ %l
+set statusline+=\ %{toupper(g:currentmode[mode()])}
+set statusline+=\ %*
+set statusline+=\ ‹‹
+set statusline+=\ %{fugitive#head()}
+set statusline+=\ %f\ %*
+set statusline+=\ ››
+set statusline+=\ %m
+set statusline+=%=
+set statusline+=\ %{LinterStatus()}
+set statusline+=\ ‹‹
+set statusline+=\ ::
+set statusline+=\ %n
+set statusline+=\ ››\ %*
+"""""""
+
+" tree file browser
 let g:netrw_liststyle = 3
 let g:netrw_banner = 0
+"""""""
 
 let mapleader='\'
 
@@ -112,8 +180,8 @@ let g:airline#extensions#tabline#tab_nr_type = 1 " tab number
 call plug#begin('~/.vim/plugged')
 
 " Status bar for vim and tmux
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
 " Git wrapper
 Plug 'tpope/vim-fugitive'
 " Tmux suppport in vim
@@ -125,15 +193,16 @@ Plug 'pangloss/vim-javascript'
 Plug 'leshill/vim-json'
 Plug 'mxw/vim-jsx'
 " Dark blue color scheme
-Plug 'cocopon/iceberg.vim'
+" Plug 'cocopon/iceberg.vim'
 " tmux statusline generator
-Plug 'edkolev/tmuxline.vim'
+" Plug 'edkolev/tmuxline.vim'
 " indent lines
 Plug 'nathanaelkane/vim-indent-guides'
 " elm support
 Plug 'elmcast/elm-vim'
 " elixir support
 Plug 'elixir-editors/vim-elixir'
+Plug 'mhinz/vim-mix-format'
 Plug 'slashmili/alchemist.vim'
 
 " scratchpad
@@ -152,6 +221,7 @@ autocmd VimEnter,ColorScheme * :hi IndentGuidesOdd  guibg=red ctermbg=232
 autocmd VimEnter,ColorScheme * :hi IndentGuidesEven guibg=green ctermbg=233
 " Others
 let g:javascript_plugin_flow = 1
+let g:mix_format_on_save = 1
 
 " ALE config
 let g:ale_javascript_eslint_use_global = 1
